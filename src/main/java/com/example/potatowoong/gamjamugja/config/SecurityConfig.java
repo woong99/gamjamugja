@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Component;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true) // TODO : 배포 시 debug 해제
 @RequiredArgsConstructor
 @Component
 public class SecurityConfig {
