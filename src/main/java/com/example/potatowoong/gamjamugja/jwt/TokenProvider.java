@@ -35,23 +35,30 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // Token 생성
     public TokenDto generateTokenDto(Authentication authentication) {
+
+        // 권한을 받음. Ex) authorities = ROLE_USER
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
+        // 현재 시간
         long now = (new Date()).getTime();
 
+        // Token 만료 시간
         Date tokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
         log.info(String.valueOf(tokenExpiresIn));
 
+        // Token 생성
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
-                .setExpiration(tokenExpiresIn)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .claim(AUTHORITIES_KEY, authorities) // Custom Claim 지정, Claims는 JWT의 body이고 JWT 생성자가 JWT를 받는이들이게 제시하기 바라는 정보를 포함
+                .setExpiration(tokenExpiresIn) // 만료시간
+                .signWith(key, SignatureAlgorithm.HS512) // sign key 지정
                 .compact();
 
+        // TokenDto에 생성한 Token의 정보를 넣는다
         return TokenDto.builder()
                 .grantType(BEARER_TYPE)
                 .accessToken(accessToken)
@@ -59,6 +66,7 @@ public class TokenProvider {
                 .build();
     }
 
+    // Token을 받았을 때 Token의 인증을 꺼내는 메소드
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
 
@@ -70,11 +78,20 @@ public class TokenProvider {
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new).toList();
 
+        /*
+        User Details
+        Spring Security에서 사용자의 정보를 담는 인터페이스
+        getAuthorities() : 계정의 권한 목록을 리턴
+        getPassword() : 계정의 비밀번호를 리턴
+        getUsername() : 계정의 고유한 값을 리턴
+         */
+        // UserDetails는 인터페이스, User는 UserDetails를 구현한 객체
         UserDetails principal = new User(claims.getSubject(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
+    // Token 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -93,7 +110,12 @@ public class TokenProvider {
 
     private Claims parseClaims(String accessToken) {
         try {
-            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
+            return Jwts
+                    .parserBuilder() // JwtParseBuilder 인스턴스 생성
+                    .setSigningKey(key) // JWT 서명 검증을 위한 키 설정
+                    .build()
+                    .parseClaimsJws(accessToken)
+                    .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
