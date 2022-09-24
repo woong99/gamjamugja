@@ -16,6 +16,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // 헤더에 있는 Token 값을 토대로 Member의 데이터를 건내주는 메소드
     public MemberResponseDto getMyInfoBySecurity() {
         return memberRepository.findById(SecurityUtil.getCurrentMemberId())
                 .map(MemberResponseDto::of)

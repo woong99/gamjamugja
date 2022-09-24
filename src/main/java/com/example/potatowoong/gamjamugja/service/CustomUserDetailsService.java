@@ -19,6 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
+    // 받은 Email을 통해 user가 실제로 존재하는지 알아보는 메소드
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return memberRepository.findByEmail(username)
                 .map(this::createUserDetails)

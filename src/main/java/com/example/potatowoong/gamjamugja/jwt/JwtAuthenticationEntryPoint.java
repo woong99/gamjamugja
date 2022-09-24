@@ -10,9 +10,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+
+// 인증이 되지 않은 유저가 요청을 했을 때 동작
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.sendError(HttpServletResponse.SC_ACCEPTED);
+        // 유효한 자격증명을 제공하지 않고 접든하려 할 때 401 Error
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }

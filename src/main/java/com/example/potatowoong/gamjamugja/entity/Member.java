@@ -28,7 +28,7 @@ public class Member {
     @Setter
     private String nickname;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // enum 이름은 DB에 저장
     private Authority authority;
 
     @Builder

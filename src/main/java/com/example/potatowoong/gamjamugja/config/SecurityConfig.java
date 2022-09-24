@@ -32,9 +32,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                // Token을 localstorage에 저장할 것이기 때문에 csrf 방지 disable
                 .csrf().disable()
+                // REST API를 통해 세션 없이 Token을 주고 받으며 데이터를 주고받기 때문에 세션 설정 STATELESS
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                // 예외 핸들링
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
