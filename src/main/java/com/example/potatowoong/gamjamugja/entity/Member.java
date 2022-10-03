@@ -28,15 +28,34 @@ public class Member {
     @Setter
     private String nickname;
 
+    @Column(nullable = false)
+    private Integer age;
+
+    @Column(nullable = false)
+    private String sex;
+
+    @Column(nullable = false)
+    private String department;
+
     @Enumerated(EnumType.STRING) // enum 이름은 DB에 저장
     private Authority authority;
 
     @Builder
-    public Member(Long id, String email, String password, String nickname, Authority authority) {
+    public Member(Long id,
+                  String email,
+                  String password,
+                  String nickname,
+                  Integer age,
+                  String sex,
+                  String department,
+                  Authority authority) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.age = age;
+        this.sex = sex;
+        this.department = department;
         this.authority = authority;
     }
 
