@@ -18,12 +18,19 @@ public class MemberRequestDto {
     private String email;
     private String password;
     private String nickname;
+    private Integer age;
+    private String sex;
+    private String department;
+
 
     public Member toMember(PasswordEncoder passwordEncoder) {
         return Member.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
                 .nickname(nickname)
+                .age(age)
+                .sex(sex)
+                .department(department)
                 .authority(Authority.ROLE_USER)
                 .build();
     }
