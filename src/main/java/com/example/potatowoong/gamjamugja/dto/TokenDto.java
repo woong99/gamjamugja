@@ -14,4 +14,8 @@ public class TokenDto {
     private String grantType;
     private String accessToken;
     private Long tokenExpiresIn;
+
+    public TokenDto(String generateToken) {
+        this.accessToken = generateToken;
+    }
 }
