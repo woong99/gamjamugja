@@ -1,8 +1,8 @@
 package com.example.potatowoong.gamjamugja.controller;
 
-import com.example.potatowoong.gamjamugja.dto.MemberRequestDto;
-import com.example.potatowoong.gamjamugja.dto.MemberResponseDto;
 import com.example.potatowoong.gamjamugja.dto.TokenDto;
+import com.example.potatowoong.gamjamugja.dto.auth.LoginRequestDto;
+import com.example.potatowoong.gamjamugja.dto.auth.SignUpRequestDto;
 import com.example.potatowoong.gamjamugja.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +18,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<MemberResponseDto> signup(@RequestBody MemberRequestDto requestDto) {
-        return ResponseEntity.ok(authService.signUp(requestDto));
+    public ResponseEntity<Void> signup(@RequestBody SignUpRequestDto requestDto) throws Exception {
+        authService.signUp(requestDto);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@RequestBody MemberRequestDto requestDto) {
+    public ResponseEntity<TokenDto> login(@RequestBody LoginRequestDto requestDto) {
         return ResponseEntity.ok(authService.login(requestDto));
     }
 }
