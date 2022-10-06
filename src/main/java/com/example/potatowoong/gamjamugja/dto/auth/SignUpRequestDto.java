@@ -1,8 +1,7 @@
-package com.example.potatowoong.gamjamugja.dto;
-
+package com.example.potatowoong.gamjamugja.dto.auth;
 
 import com.example.potatowoong.gamjamugja.entity.Authority;
-import com.example.potatowoong.gamjamugja.entity.Member;
+import com.example.potatowoong.gamjamugja.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MemberRequestDto {
+public class SignUpRequestDto {
     private String email;
     private String password;
     private String nickname;
@@ -22,9 +21,8 @@ public class MemberRequestDto {
     private String sex;
     private String department;
 
-
-    public Member toMember(PasswordEncoder passwordEncoder) {
-        return Member.builder()
+    public User toUser(PasswordEncoder passwordEncoder) {
+        return User.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
                 .nickname(nickname)
