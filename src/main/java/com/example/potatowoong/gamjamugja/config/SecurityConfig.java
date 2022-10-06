@@ -2,7 +2,7 @@ package com.example.potatowoong.gamjamugja.config;
 
 import com.example.potatowoong.gamjamugja.jwt.JwtAccessDeniedHandler;
 import com.example.potatowoong.gamjamugja.jwt.JwtAuthenticationEntryPoint;
-import com.example.potatowoong.gamjamugja.jwt.TokenProvider;
+import com.example.potatowoong.gamjamugja.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,12 +15,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Component;
 
 @Configuration
-@EnableWebSecurity(debug = true) // TODO : 배포 시 debug 해제
+@EnableWebSecurity() // TODO : 배포 시 debug 해제
 @RequiredArgsConstructor
 @Component
 public class SecurityConfig {
 
-    private final TokenProvider tokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
@@ -43,10 +43,12 @@ public class SecurityConfig {
                 .accessDeniedHandler(jwtAccessDeniedHandler)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/auth/**").permitAll()
-                .anyRequest().authenticated()
+//                .antMatchers("/auth/**").permitAll()
+//                .antMatchers("/chat/**").permitAll()
+//                .anyRequest().authenticated()
+                .anyRequest().permitAll()
                 .and()
-                .apply(new JwtSecurityConfig(tokenProvider));
+                .apply(new JwtSecurityConfig(jwtTokenProvider));
 
         return http.build();
     }
