@@ -1,11 +1,11 @@
 package com.example.potatowoong.gamjamugja.service;
 
-import com.example.potatowoong.gamjamugja.dto.MemberRequestDto;
-import com.example.potatowoong.gamjamugja.dto.MemberResponseDto;
 import com.example.potatowoong.gamjamugja.dto.TokenDto;
-import com.example.potatowoong.gamjamugja.entity.Member;
-import com.example.potatowoong.gamjamugja.jwt.TokenProvider;
-import com.example.potatowoong.gamjamugja.repository.MemberRepository;
+import com.example.potatowoong.gamjamugja.dto.auth.LoginRequestDto;
+import com.example.potatowoong.gamjamugja.dto.auth.SignUpRequestDto;
+import com.example.potatowoong.gamjamugja.entity.User;
+import com.example.potatowoong.gamjamugja.jwt.JwtTokenProvider;
+import com.example.potatowoong.gamjamugja.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,18 +18,19 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class AuthService {
-    private final AuthenticationManagerBuilder managerBuilder;
-    private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final TokenProvider tokenProvider;
 
-    public MemberResponseDto signUp(MemberRequestDto requestDto) {
-        if (memberRepository.existsByEmail(requestDto.getEmail())) {
+    private final AuthenticationManagerBuilder managerBuilder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public void signUp(SignUpRequestDto req) {
+        if (userRepository.existsByEmail(req.getEmail())) {
             throw new RuntimeException("이미 가입되어 있는 유저입니다.");
         }
 
-        Member member = requestDto.toMember(passwordEncoder);
-        return MemberResponseDto.of(memberRepository.save(member));
+        User user = req.toUser(passwordEncoder);
+        userRepository.save(user);
     }
 
     /*
@@ -39,11 +40,11 @@ public class AuthService {
     4. DaoAuthenticationProvider 내부에 있는 authenticate에서 retrieveUser을 통해 DB에서의 User의 비밀번호가 실제 비밀번호와 맞는지 비교
     5. retrieveUser에서는 DB에서의 User를 꺼내기 위해, CustomUserDetailService에 있는 loadUserByUsername을 가져와 사용
      */
-    public TokenDto login(MemberRequestDto requestDto) {
-        UsernamePasswordAuthenticationToken authenticationToken = requestDto.toAuthentication();
+    public TokenDto login(LoginRequestDto req) {
+        UsernamePasswordAuthenticationToken authenticationToken = req.toAuthentication();
 
         Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
 
-        return tokenProvider.generateTokenDto(authentication);
+        return jwtTokenProvider.generateTokenDto(authentication);
     }
 }
