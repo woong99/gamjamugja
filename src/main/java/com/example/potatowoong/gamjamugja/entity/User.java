@@ -1,9 +1,6 @@
 package com.example.potatowoong.gamjamugja.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -11,7 +8,8 @@ import javax.persistence.*;
 @Getter
 @Builder
 @NoArgsConstructor
-public class Member {
+@ToString
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -40,15 +38,16 @@ public class Member {
     @Enumerated(EnumType.STRING) // enum 이름은 DB에 저장
     private Authority authority;
 
+
     @Builder
-    public Member(Long id,
-                  String email,
-                  String password,
-                  String nickname,
-                  Integer age,
-                  String sex,
-                  String department,
-                  Authority authority) {
+    public User(Long id,
+                String email,
+                String password,
+                String nickname,
+                Integer age,
+                String sex,
+                String department,
+                Authority authority) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -58,5 +57,4 @@ public class Member {
         this.department = department;
         this.authority = authority;
     }
-
 }
