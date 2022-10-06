@@ -10,8 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -22,23 +22,24 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class TokenProvider {
+public class JwtTokenProvider {
 
     private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "bearer";
-    //    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 3;  // TODO : 테스트 후 수정
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
+    //    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 10;  // TODO : 테스트 후 수정
     private final Key key;
+    private final UserDetailsService userDetailsService;
 
 
-    public TokenProvider(@Value("${jwt.secret}") String secretKey) {
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
     // Token 생성
     public TokenDto generateTokenDto(Authentication authentication) {
-
         // 권한을 받음. Ex) authorities = ROLE_USER
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -79,17 +80,15 @@ public class TokenProvider {
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new).toList();
 
-        /*
-        User Details
-        Spring Security에서 사용자의 정보를 담는 인터페이스
-        getAuthorities() : 계정의 권한 목록을 리턴
-        getPassword() : 계정의 비밀번호를 리턴
-        getUsername() : 계정의 고유한 값을 리턴
-         */
-        // UserDetails는 인터페이스, User는 UserDetails를 구현한 객체
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        String username = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody()
+                .getSubject();
 
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     // Token 검증
