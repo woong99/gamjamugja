@@ -1,13 +1,13 @@
 package com.example.potatowoong.gamjamugja.controller;
 
-import com.example.potatowoong.gamjamugja.adapter.UserAdapter;
+import com.example.potatowoong.gamjamugja.annotation.AuthUser;
 import com.example.potatowoong.gamjamugja.dto.ChangePasswordRequestDto;
 import com.example.potatowoong.gamjamugja.dto.user.UserRequestDto;
 import com.example.potatowoong.gamjamugja.dto.user.UserResponseDto;
+import com.example.potatowoong.gamjamugja.entity.User;
 import com.example.potatowoong.gamjamugja.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,8 +18,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDto> getMyUserInfo(@AuthenticationPrincipal UserAdapter userAdapter) {
-        return ResponseEntity.ok(UserResponseDto.of(userAdapter.getUser()));
+    public ResponseEntity<UserResponseDto> getMyUserInfo(@AuthUser User user) {
+        return ResponseEntity.ok(UserResponseDto.of(user));
     }
 
     @PostMapping("/nickname")

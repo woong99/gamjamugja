@@ -1,13 +1,12 @@
 spring:
   datasource:
-    url:
-      jdbc:mysql://localhost:3306/chat
+    url: jdbc:mysql://localhost:3306/chat
     username: woong
     password: Jhan00254!
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update # todo: 배포 시 ddl-auto 삭제
     properties:
       hibernate:
         format_sql: true
